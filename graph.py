@@ -51,11 +51,15 @@ class graph():
         return self.data
     
     #depth first search on the graph starting at the input vertex v
-    def DFS(self, v):
-        vs = self.data.keys
-        g = self.data.copy()
-        current_v = v
-        return g
+    #-v: starting vertex
+    #-visited: array to keep track of those vertices that have been visited.
+    def DFS(self, v, visited):
+        for u in self.data[v]:
+            if u not in visited:
+                visited.append(u)
+                print(u)
+                self.DFS(u, visited)
+        return visited
         
     
 g = graph()
@@ -68,4 +72,4 @@ g.addNode(1)
 g.addNode(10)
 g.removeNode(10)
 print(g.getGraph())
-#print(g.DFS(1))
+print(g.DFS(1, [1]))
