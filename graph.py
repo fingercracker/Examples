@@ -50,15 +50,22 @@ class graph():
     def getGraph(self):
         return self.data
     
-    #depth first search on the graph starting at the input vertex v
+     #depth first search on the graph starting at the input vertex v
     #-v: starting vertex
     #-visited: array to keep track of those vertices that have been visited.
-    def DFS(self, v, visited):
-        for u in self.data[v]:
-            if u not in visited:
+    #-f_val: optional input, which is a destination node if we want to finda path
+    #  between two nodes in the graph 
+    def DFS(self, v, visited, f_val = None):
+        for u in self.data[v]:   #self.data[v] == list of all neighbors of v
+            if u == f_val:
                 visited.append(u)
-                print(u)
-                self.DFS(u, visited)
+                return visited
+            if u not in visited:
+                if f_val not in visited:   #only recurse if f_val not found
+                    visited.append(u)
+                    self.DFS(u, visited, f_val)
+                else:
+                    return visited
         return visited
         
     
@@ -72,4 +79,5 @@ g.addNode(1)
 g.addNode(10)
 g.removeNode(10)
 print(g.getGraph())
-print(g.DFS(1, [1]))
+v = 4
+print(g.DFS(v, [v]), 5)
