@@ -3,3 +3,6 @@
 *.pyc
 *.tar.gz
 *venv*
+*.o
+*.so
+*.out
