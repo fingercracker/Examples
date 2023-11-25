@@ -20,9 +20,3 @@ int Something::getSomething() {
 std::string Something::getNothing() {
     return _nothing;
 }
-
-int main() {
-    Something s{1, "nothing"};
-    std::cout << "s.nothing is " << s.getNothing() << "." << std::endl;
-    std::cout << "s.something is " << s.getSomething() << "." << std::endl;
-}
