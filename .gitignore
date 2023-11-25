@@ -3,3 +3,8 @@
 *.pyc
 *.tar.gz
 *venv*
+*.o
+*.so
+*.out
+Swig/C/*.py
+Swig/CXX/*.py
