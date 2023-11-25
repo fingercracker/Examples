@@ -6,3 +6,5 @@
 *.o
 *.so
 *.out
+Swig/C/*.py
+Swig/CXX/*.py
