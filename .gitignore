@@ -6,5 +6,6 @@
 *.o
 *.so
 *.out
+*.exe
 Swig/C/*.py
 Swig/CXX/*.py
