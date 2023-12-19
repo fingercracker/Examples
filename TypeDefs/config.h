@@ -1,5 +1,7 @@
 #include "system_file.h"
 
+int some_func(int x);
+
 #ifdef SYSTEM_SUCCESSFUL
 typedef system_type fsw_type;
 #define SUCCESSFUL SYSTEM_SUCCESSFUL
