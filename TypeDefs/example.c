@@ -19,8 +19,6 @@ int main() {
     print_failure();
     print_success();
     do_something();
-    //int (*some_func)(int);
-    //some_func = &system_some_func;
     int y = some_func(1);
     printf("y is %i\n", y);
     return 1;
