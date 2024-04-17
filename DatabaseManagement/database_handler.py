@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2.extensions import AsIs
 from typing import Any, Dict, List, Tuple
-import table_utils
+import DatabaseManagement.table_utils as table_utils
 
 
 def create_table(conn, table_name: str, column_info: dict):

@@ -13,11 +13,11 @@ harness:
     from:
       type: text
     pin:
-      type: text
+      type: integer
     to:
       type: text
     pin_1:
-      type: text
+      type: integer
     manufacturer:
       type: text
     
