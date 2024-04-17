@@ -1,0 +1,44 @@
+h33:
+  columns:
+    harness:
+      type: text
+    reference:
+      type: text
+    mark:
+      type: text
+    net: 
+      type: text
+    wire: 
+      type: text
+    from:
+      type: text
+    pin:
+      type: text
+    to:
+      type: text
+    pin_1:
+      type: text
+    manufacturer:
+      type: text
+h70:
+  columns:
+    harness:
+      type: text
+    reference:
+      type: text
+    mark:
+      type: text
+    net: 
+      type: text
+    wire: 
+      type: text
+    from:
+      type: text
+    pin:
+      type: text
+    to:
+      type: text
+    pin_1:
+      type: text
+    manufacturer:
+      type: text
