@@ -30,4 +30,3 @@ harness:
     manufacturer:
       type: text
       fillna: ""
-    
