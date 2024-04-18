@@ -5,6 +5,8 @@ import yaml
 from typing import Dict, Any, Union, List, Tuple
 import os
 from dotenv import load_dotenv
+import sys
+import argparse
 
 def ingest_harness_table_data(
     dir_path: str, schema: Dict[str, str]
@@ -58,8 +60,16 @@ def ingest_harness_table_data(
     return errors, data
 
 
-def main():
+def main(drop=False):
     """
+        Main function that will create tables and ingest data into them. If
+        we want to drop existing tables before adding them, then we can specify
+        with an optional parameter.
+
+        Params
+        ------
+            * drop: Optional boolean param, default = False. If True, then
+                we will drop all tables that we are trying to create if they exist
     """
     load_dotenv(f"{os.path.dirname(__file__)}/../.env")
     schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
@@ -74,10 +84,11 @@ def main():
     password = os.getenv("HARNESS_DB_PASSWORD")
     conn = psycopg2.connect(host="ema-harness-db", user="ema_mgr", password=password, dbname="harness")
     for key in harness_data.keys():
-        # drop tables if they do exist
-        # TODO: remove this!!!
-        if dh.table_exists(conn, key):
-            dh.drop_table(conn, key)
+        
+        # we can determine if we want to drop tables before creating them.
+        if drop is True:
+            if dh.table_exists(conn, key):
+                dh.drop_table(conn, key)
 
         # create tables if they do not exist
         cols = list(harness_data[key][0].keys())
@@ -88,4 +99,8 @@ def main():
         dh.insert_records(conn, key, harness_data[key])
 
 if __name__ == "__main__":
-    main()
+    # pass 
+    parser = argparse.ArgumentParser(prog="PROG")
+    parser.add_argument("--drop", type=bool, default=False)
+    args = parser.parse_args()
+    main(drop=args.drop)
