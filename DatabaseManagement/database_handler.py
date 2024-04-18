@@ -65,6 +65,11 @@ def insert_records(conn, table_name: str, records_list: List[Dict[str, Any]]):
 def delete_from_table(conn, table_name: str):
     """
         Delete all records from table with given name
+
+        Params
+        ------
+            * conn: psycopg2 connection object
+            * table_name: string representing the name of the table we wish to delete from
     """
     print(f"Deleting records from {table_name}...")
     cur = conn.cursor()
@@ -77,6 +82,14 @@ def delete_from_table(conn, table_name: str):
 
 def table_exists(conn, table_name: str):
     """
+        Determine if the table with the given name exists in the database 
+        specified by the connection object
+
+        Params
+        ------
+            * conn: psycopg2 connection object
+            * table_name: string representing the name of the table, the existence
+                of which we are interested in
     """
     print(f"Checking for existence of {table_name}...")
     cur = conn.cursor()
@@ -92,6 +105,15 @@ def table_exists(conn, table_name: str):
         return False
     
 def drop_table(conn, table_name: str):
+    """
+        Drop the table with the given name if it exists from the database
+        specified by the connection object
+
+        Params
+        ------
+            * conn: psycopg2 connection object
+            * table_name: string representing the name of the table we wish to drop
+    """
     print(f"Dropping {table_name}...")
     cur = conn.cursor()
     sql = """
