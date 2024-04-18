@@ -9,3 +9,4 @@
 *.exe
 Swig/C/*.py
 Swig/CXX/*.py
+*.env*

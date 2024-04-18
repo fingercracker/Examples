@@ -4,6 +4,7 @@ import pandas as pd
 import yaml
 from typing import Dict, Any, Union, List, Tuple
 import os
+from dotenv import load_dotenv
 
 def ingest_harness_table_data(
     dir_path: str, schema: Dict[str, str]
@@ -34,8 +35,12 @@ def ingest_harness_table_data(
             df = pd.read_csv(harness_file_path)
         else:
             raise Exception(f"We do not handle file types {file_ext}")
+        
+        values = {x: schema[x]["fillna"] for x in schema.keys()}
+        df.columns = df.columns.str.lower().str.strip()
+        df.fillna(value=values)
 
-        data_col_names = sorted([x.lower().strip() for x in df.columns])
+        data_col_names = sorted([x for x in df.columns])
         table_col_names = sorted(list(schema.keys()))
 
         if data_col_names != table_col_names:
@@ -45,15 +50,27 @@ def ingest_harness_table_data(
             data_list = df.to_dict(orient="records")
             table_num = harness_file.split("-")[-1].split(file_ext)[0]
             table_name = f"h{table_num}"
+            if table_name == "h83":
+                breakpoint()
             data[table_name] = data_list
 
     return errors, data
 
 
 if __name__ == "__main__":
+    load_dotenv(f"{os.path.dirname(__file__)}/../.env")
     schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
     harness_schema = schema["harness"]["columns"]
     dir_path = "/home/johnwillis/Lasp-Docs/Harness/HRN Tests"
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
 
-    
+    password = os.getenv("HARNESS_DB_PASSWORD")
+    conn = psycopg2.connect(host="ema-harness-db", user="ema_mgr", password=password, dbname="harness")
+    # create tables if they do not exist
+    for key in harness_data.keys():
+        cols = list(harness_data[key][0].keys())
+        column_info = {col: harness_schema[col]["type"] for col in cols}
+        dh.create_table(conn, key, column_info)
+
+    for key in harness_data.keys():
+        dh.insert_records(conn, key, harness_data[key])

@@ -2,22 +2,32 @@ harness:
   columns:
     harness:
       type: text
+      fillna: ""
     reference:
       type: text
+      fillna: ""
     mark:
       type: text
+      fillna: ""
     net: 
       type: text
+      fillna: ""
     wire: 
       type: text
+      fillna: ""
     from:
       type: text
+      fillna: ""
     pin:
       type: integer
+      fillna: -1
     to:
       type: text
+      fillna: ""
     pin_1:
       type: integer
+      fillna: -1
     manufacturer:
       type: text
+      fillna: ""
     
