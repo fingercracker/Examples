@@ -90,3 +90,13 @@ def table_exists(conn, table_name: str):
         return True
     else:
         return False
+    
+def drop_table(conn, table_name: str):
+    print(f"Dropping {table_name}...")
+    cur = conn.cursor()
+    sql = """
+        drop table if exists %s
+    """
+    formatted_sql = cur.mogrify(sql, (AsIs(table_name),))
+    cur.execute(formatted_sql)
+    conn.commit()

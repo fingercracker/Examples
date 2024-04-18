@@ -24,7 +24,7 @@ def ingest_harness_table_data(
     all_files = os.listdir(dir_path)
     harness_files = [x for x in all_files if "harness-" in x and os.path.isdir(x) is False]
 
-    errors = []
+    errors = None
     data = {}
     for harness_file in harness_files:
         harness_file_path = os.path.join(dir_path, harness_file)
@@ -38,39 +38,54 @@ def ingest_harness_table_data(
         
         values = {x: schema[x]["fillna"] for x in schema.keys()}
         df.columns = df.columns.str.lower().str.strip()
-        df.fillna(value=values)
+        df = df.astype(str)
+        df.fillna(value=values, inplace=True)
 
         data_col_names = sorted([x for x in df.columns])
         table_col_names = sorted(list(schema.keys()))
 
         if data_col_names != table_col_names:
             error_msg = f"Data in {harness_file} has the incorrect schema."
+            if errors is None:
+                errors = []
             errors.append(error_msg)
         else:
             data_list = df.to_dict(orient="records")
             table_num = harness_file.split("-")[-1].split(file_ext)[0]
             table_name = f"h{table_num}"
-            if table_name == "h83":
-                breakpoint()
             data[table_name] = data_list
 
     return errors, data
 
 
-if __name__ == "__main__":
+def main():
+    """
+    """
     load_dotenv(f"{os.path.dirname(__file__)}/../.env")
     schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
     harness_schema = schema["harness"]["columns"]
     dir_path = "/home/johnwillis/Lasp-Docs/Harness/HRN Tests"
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
 
+    if errors is not None:
+        for error in error:
+            print(error)
+
     password = os.getenv("HARNESS_DB_PASSWORD")
     conn = psycopg2.connect(host="ema-harness-db", user="ema_mgr", password=password, dbname="harness")
-    # create tables if they do not exist
     for key in harness_data.keys():
+        # drop tables if they do exist
+        # TODO: remove this!!!
+        if dh.table_exists(conn, key):
+            dh.drop_table(conn, key)
+
+        # create tables if they do not exist
         cols = list(harness_data[key][0].keys())
         column_info = {col: harness_schema[col]["type"] for col in cols}
         dh.create_table(conn, key, column_info)
 
     for key in harness_data.keys():
         dh.insert_records(conn, key, harness_data[key])
+
+if __name__ == "__main__":
+    main()

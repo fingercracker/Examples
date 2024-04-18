@@ -19,14 +19,14 @@ harness:
       type: text
       fillna: ""
     pin:
-      type: integer
-      fillna: -1
+      type: text
+      fillna: ""
     to:
       type: text
       fillna: ""
     pin_1:
-      type: integer
-      fillna: -1
+      type: text
+      fillna: ""
     manufacturer:
       type: text
       fillna: ""
