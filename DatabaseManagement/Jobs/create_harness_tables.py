@@ -2,10 +2,9 @@ import psycopg2
 import DatabaseManagement.database_handler as dh
 import pandas as pd
 import yaml
-from typing import Dict, Any, Union, List, Tuple
+from typing import Dict, List, Tuple
 import os
 from dotenv import load_dotenv
-import sys
 import argparse
 
 def ingest_harness_table_data(
@@ -33,6 +32,8 @@ def ingest_harness_table_data(
         file_ext = os.path.splitext(harness_file_path)[-1]
         if file_ext == ".xlsx":
             df = pd.read_excel(harness_file_path, engine="openpyxl")
+        elif file_ext == ".xls":
+            df = pd.read_excel(harness_file_path, engine="xlrd")
         elif file_ext == ".csv":
             df = pd.read_csv(harness_file_path)
         else:
@@ -60,7 +61,7 @@ def ingest_harness_table_data(
     return errors, data
 
 
-def main(drop=False):
+def main(dir_path: str, drop=False):
     """
         Main function that will create tables and ingest data into them. If
         we want to drop existing tables before adding them, then we can specify
@@ -68,13 +69,14 @@ def main(drop=False):
 
         Params
         ------
+            * dir_path: string representing the path to the directory containing
+                the data to be used for constructing the harness tables
             * drop: Optional boolean param, default = False. If True, then
                 we will drop all tables that we are trying to create if they exist
     """
     load_dotenv(f"{os.path.dirname(__file__)}/../.env")
     schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
     harness_schema = schema["harness"]["columns"]
-    dir_path = "/home/johnwillis/Lasp-Docs/Harness/HRN Tests"
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
 
     if errors is not None:
@@ -99,8 +101,8 @@ def main(drop=False):
         dh.insert_records(conn, key, harness_data[key])
 
 if __name__ == "__main__":
-    # pass 
-    parser = argparse.ArgumentParser(prog="PROG")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--drop", type=bool, default=False)
+    parser.add_argument("--dir_path", type=str)
     args = parser.parse_args()
-    main(drop=args.drop)
+    main(dir_path=args.dir_path, drop=args.drop)
