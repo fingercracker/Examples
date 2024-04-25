@@ -4,7 +4,6 @@ import pandas as pd
 import yaml
 from typing import Dict, List, Tuple
 import os
-from dotenv import load_dotenv
 import argparse
 
 def ingest_harness_table_data(
@@ -74,7 +73,6 @@ def main(dir_path: str, drop=False):
             * drop: Optional boolean param, default = False. If True, then
                 we will drop all tables that we are trying to create if they exist
     """
-    load_dotenv(f"{os.path.dirname(__file__)}/../.env")
     schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
     harness_schema = schema["harness"]["columns"]
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
@@ -83,8 +81,7 @@ def main(dir_path: str, drop=False):
         for error in error:
             print(error)
 
-    password = os.getenv("HARNESS_DB_PASSWORD")
-    conn = psycopg2.connect(host="ema-harness-db", user="ema_mgr", password=password, dbname="harness")
+    conn = dh.get_conn()
     for key in harness_data.keys():
         
         # we can determine if we want to drop tables before creating them.

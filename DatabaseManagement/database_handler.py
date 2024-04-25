@@ -1,8 +1,16 @@
 import psycopg2
 from psycopg2.extensions import AsIs
-from typing import Any, Dict, List, Tuple
-import DatabaseManagement.table_utils as table_utils
+from psycopg2.extras import RealDictCursor
+from typing import Any, Dict, List
 
+from dotenv import load_dotenv
+import os
+
+def get_conn(host="ema-harness-db", user="ema_mgr", dbname="harness"):
+    load_dotenv()
+    password = os.environ["HARNESS_DB_PASSWORD"]
+    conn = psycopg2.connect(host=host, user=user, password=password, dbname=dbname)
+    return conn
 
 def create_table(conn, table_name: str, column_info: dict):
     """
@@ -122,3 +130,66 @@ def drop_table(conn, table_name: str):
     formatted_sql = cur.mogrify(sql, (AsIs(table_name),))
     cur.execute(formatted_sql)
     conn.commit()
+
+def select_with_where(
+    conn, 
+    table_name: str,
+    wheres: Dict[str, Any] = None,
+    cols: List[str] = None,
+    groupers: List[str] = None
+) -> List[Dict[str, Any]]:
+    """
+        Select optional columns, or * if no columns passed, from the table with the given name
+        filtered based on the list of wheres and associated vals
+
+        Params
+        ------
+            * conn: psycopg2 connection object to a postgresql database
+            * table_name: name of a table in the postgresql database held by the connection
+            * wheres: optional dict keyed by column name with value as column value to filter on
+            * cols: optional list of column names to select from the table. Select * if none passed. Default = None
+        
+        Return
+        ------
+            * records: list of dicts, each representing a row with the selected columns from the query
+    """
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    # add quotes around column names because of keyworded column names
+    cols = [f'"{x}"' for x in cols]
+
+    if cols is None:
+        select_cols = AsIs("*")
+    else:
+        select_cols = AsIs(",".join(cols))
+
+    if wheres is not None:
+        where = AsIs(" and ".join([f"{x} {wheres[x][0]} '{wheres[x][1]}'" for x in wheres]))
+        if groupers is not None:
+            groups = AsIs(",".join(groupers))
+            sql = """
+                select %s from %s where %s group by %s
+            """
+            query = cur.mogrify(sql, (select_cols, AsIs(table_name), where, groups,))
+        else:
+            sql = """
+                select %s from %s where %s
+            """
+            query = cur.mogrify(sql, (select_cols, AsIs(table_name), where,))
+    else:
+        if groupers is not None:
+            groups = AsIs(",".join(groupers))
+            sql = """
+                select %s from %s group by %s
+            """
+            query = cur.mogrify(sql, (select_cols, AsIs(table_name), groups))
+        else:
+            sql = """
+                select %s from %s
+            """
+            query = cur.mogrify(sql, (select_cols, AsIs(table_name),))
+
+    cur.execute(query)
+    conn.commit()
+    records = cur.fetchall()
+    return records
