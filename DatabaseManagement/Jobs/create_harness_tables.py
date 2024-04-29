@@ -35,13 +35,26 @@ def ingest_harness_table_data(
             df = pd.read_excel(harness_file_path, engine="xlrd")
         elif file_ext == ".csv":
             df = pd.read_csv(harness_file_path)
+        elif "#" in file_ext:
+            raise Exception(
+                f"harness file {harness_file} appears to have a lock on it. Please close open input files and try again."
+            )
         else:
             raise Exception(f"We do not handle file types {file_ext}")
         
+        # fill NA values based on schema
         values = {x: schema[x]["fillna"] for x in schema.keys()}
+        # lower case all column names
         df.columns = df.columns.str.lower().str.strip()
+        # don't use keyword column names in tables
+        df.rename({"from": "source", "to": "target"}, axis=1, inplace=True)
         df = df.astype(str)
         df.fillna(value=values, inplace=True)
+        
+        # apply upper() to all columns so that we don't have issues with case difference
+        # evaluating to true when we diff columns in the database. ::sigh:: :(
+        for col in df.columns:
+            df[col] = df[col].str.upper()
 
         data_col_names = sorted([x for x in df.columns])
         table_col_names = sorted(list(schema.keys()))

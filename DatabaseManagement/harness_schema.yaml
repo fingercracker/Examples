@@ -15,13 +15,13 @@ harness:
     wire: 
       type: text
       fillna: ""
-    from:
+    source:
       type: text
       fillna: ""
     pin:
       type: text
       fillna: ""
-    to:
+    target:
       type: text
       fillna: ""
     pin_1:

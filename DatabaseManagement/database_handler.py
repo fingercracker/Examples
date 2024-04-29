@@ -156,7 +156,7 @@ def select_with_where(
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     # add quotes around column names because of keyworded column names
-    cols = [f'"{x}"' for x in cols]
+    # cols = [f'"{x}"' for x in cols]
 
     if cols is None:
         select_cols = AsIs("*")
