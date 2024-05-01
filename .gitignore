@@ -11,3 +11,4 @@ Swig/C/*.py
 Swig/CXX/*.py
 *.env*
 *csv
+*.~lock*

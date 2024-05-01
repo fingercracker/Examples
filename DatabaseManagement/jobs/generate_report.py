@@ -5,7 +5,7 @@ import os
 import sys
 import argparse
 
-def main(input_tables: List[str]):
+def main(input_tables: List[str], output_file: str):
     """
         given a list of input tables, trace all unique signals through
         the harnesses and output a report as a .xlsx file
@@ -38,8 +38,12 @@ def main(input_tables: List[str]):
         ]
         source_recs = dh.select_with_where(conn, input_table, cols=cols)
 
+        target_names = [x["target"] for x in source_recs]
+        source_names = [x["source"] for x in source_recs]
+        source_only_recs = [x for x in source_recs if x["source"] not in target_names]
+
         tmp_data = []
-        for rec in source_recs:
+        for rec in source_only_recs:
             signal_net_name = rec["net"]
             to_pin = rec["pin_1"]
             from_pin = rec["pin"]
@@ -51,33 +55,36 @@ def main(input_tables: List[str]):
             tmp_data = [signal_net_name, harness, from_connector, from_pin, harness, to_connector, to_pin]
             
             while harness is not None:
-                signals = dh.select_with_where(
-                    conn,
-                    table_name=harness,
-                    cols=["net", "count(net) as num_signals"],
-                    groupers=["net"]
-                )
-                breakpoint()
-                connector_split = to_connector.split("-")
-                if len(connector_split) == 3:
-                    harness = connector_split[0].lower()
-                elif len(connector_split) == 4:
-                    harness = "".join(connector_split[:2]).lower()
+                # if the target harness shows up in the source column,
+                # then do a self join
+                if to_connector in source_names:
+                    wheres = {
+                        "net": ("=", signal_net_name),
+                        "source": ("=", to_connector)
+                    }
                 else:
-                    harness = None
+                    connector_split = to_connector.split("-")
+                    if len(connector_split) == 3:
+                        harness = connector_split[0].lower()
+                    elif len(connector_split) == 4:
+                        harness = "".join(connector_split[:2]).lower()
+                    else:
+                        harness = None
 
-                if harness not in harness_tables:
-                    harness = None
+                    if harness not in harness_tables:
+                        harness = None
+
+                    wheres = {
+                        "net": ("=", signal_net_name),
+                        "pin": ("=", to_pin)
+                    }
 
                 if harness is not None:
                     recs = dh.select_with_where(
                         conn,
                         table_name=harness,
                         cols=cols,
-                        wheres={
-                            "net": ("=", signal_net_name),
-                            "pin": ("=", to_pin)
-                        }
+                        wheres=wheres
                     )
 
                     num_recs = len(recs)
@@ -91,8 +98,11 @@ def main(input_tables: List[str]):
                         to_pin = tmp_rec["pin_1"]
 
                         tmp_data += [harness, from_connector, from_pin, harness, to_connector, to_pin]
+                    elif num_recs == 0: # dead end, empty data.
+                        harness = None
                     elif num_recs > 1:
                         raise Exception(f"There should be at most one connecting harness but we got {num_recs}")
+
             tmp_data += [wire_type, wire_description]
             data_list.append(tmp_data)
 
@@ -112,10 +122,11 @@ def main(input_tables: List[str]):
         counter += 1
 
     df = pd.DataFrame(data_list, columns=columns)
-    df.to_csv("./test_output.csv", index=False)
+    df.to_csv(output_file, index=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_tables", nargs="+")
+    parser.add_argument("--output_file", default="./test_output.csv")
     args = parser.parse_args()
-    main(input_tables=args.input_tables)
+    main(input_tables=args.input_tables, output_file=args.output_file)

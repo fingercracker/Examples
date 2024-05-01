@@ -164,7 +164,14 @@ def select_with_where(
         select_cols = AsIs(",".join(cols))
 
     if wheres is not None:
-        where = AsIs(" and ".join([f"{x} {wheres[x][0]} '{wheres[x][1]}'" for x in wheres]))
+        where = AsIs(" and ".join(
+                [
+                    f"{x} {wheres[x][0]} '{wheres[x][1]}'"
+                    if type(wheres[x][1]) != tuple else f"{x} {wheres[x][0]} {wheres[x][1]}"
+                    for x in wheres
+                ]
+            )
+        )
         if groupers is not None:
             groups = AsIs(",".join(groupers))
             sql = """
