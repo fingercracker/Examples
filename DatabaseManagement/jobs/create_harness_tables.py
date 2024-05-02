@@ -1,4 +1,3 @@
-import psycopg2
 import DatabaseManagement.utils.database_handler as dh
 from DatabaseManagement.utils import file_utils
 import pandas as pd
