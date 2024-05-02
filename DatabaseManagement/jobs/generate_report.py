@@ -59,8 +59,8 @@ def process_record(
                 "pin": ("=", to_pin)
             }
 
-        if harness not in harness_tables:
-                harness = None
+            if harness not in harness_tables:
+                    harness = None
 
         if harness is not None:
             recs = dh.select_with_where(
