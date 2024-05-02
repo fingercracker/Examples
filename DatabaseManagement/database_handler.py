@@ -6,9 +6,10 @@ from typing import Any, Dict, List
 from dotenv import load_dotenv
 import os
 
-def get_conn(host="ema-harness-db", user="ema_mgr", dbname="harness"):
+def get_conn(host="ema-harness-db", dbname="harness"):
     load_dotenv()
     password = os.environ["HARNESS_DB_PASSWORD"]
+    user = os.environ["HARNESS_DB_USER"]
     conn = psycopg2.connect(host=host, user=user, password=password, dbname=dbname)
     return conn
 
