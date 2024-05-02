@@ -1,4 +1,4 @@
-import DatabaseManagement.database_handler as dh
+import DatabaseManagement.utils.database_handler as dh
 import pandas as pd
 from typing import List
 import os
