@@ -5,8 +5,8 @@ import pandas as pd
 from DatabaseManagement.utils import file_utils
 
 def compare_output_files(path1: str, path2: str):
-    df1 = file_utils.dataframe_from_file(path1)
-    df2 = file_utils.dataframe_from_file(path2)
+    df1, _ = file_utils.dataframe_from_file(path1)
+    df2, _ = file_utils.dataframe_from_file(path2)
 
     assert all([df1.columns[i] == df2.columns[i] for i in range(len(df1.columns))])
 

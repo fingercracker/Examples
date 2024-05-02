@@ -29,8 +29,8 @@ def ingest_harness_table_data(
     data = {}
     for harness_file in harness_files:
         harness_file_path = os.path.join(dir_path, harness_file)
-        df = file_utils.dataframe_from_file(harness_file_path)
-        
+        df, file_ext = file_utils.dataframe_from_file(harness_file_path)
+
         # fill NA values based on schema
         values = {x: schema[x]["fillna"] for x in schema.keys()}
         # lower case all column names
@@ -75,7 +75,7 @@ def main(dir_path: str, drop=False):
             * drop: Optional boolean param, default = False. If True, then
                 we will drop all tables that we are trying to create if they exist
     """
-    schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
+    schema = yaml.safe_load(open("DatabaseManagement/config/harness_schema.yaml"))
     harness_schema = schema["harness"]["columns"]
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
 

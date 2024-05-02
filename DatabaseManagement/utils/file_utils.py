@@ -16,4 +16,4 @@ def dataframe_from_file(path: str) -> pd.DataFrame:
     else:
         raise Exception(f"We do not handle file types {file_ext}")
     
-    return df
+    return df, file_ext
