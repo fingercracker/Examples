@@ -1,0 +1,32 @@
+harness:
+  columns:
+    harness:
+      type: text
+      fillna: ""
+    reference:
+      type: text
+      fillna: ""
+    mark:
+      type: text
+      fillna: ""
+    net: 
+      type: text
+      fillna: ""
+    wire: 
+      type: text
+      fillna: ""
+    source:
+      type: text
+      fillna: ""
+    pin:
+      type: text
+      fillna: ""
+    target:
+      type: text
+      fillna: ""
+    pin_1:
+      type: text
+      fillna: ""
+    manufacturer:
+      type: text
+      fillna: ""
