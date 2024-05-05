@@ -74,7 +74,8 @@ def main(dir_path: str, drop=False):
             * drop: Optional boolean param, default = False. If True, then
                 we will drop all tables that we are trying to create if they exist
     """
-    schema = yaml.safe_load(open("DatabaseManagement/config/harness_schema.yaml"))
+    schema_path = f"{os.path.dirname(__file__)}/../config/harness_schema.yaml"
+    schema = yaml.safe_load(open(schema_path))
     harness_schema = schema["harness"]["columns"]
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
 

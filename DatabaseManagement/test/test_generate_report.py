@@ -1,5 +1,10 @@
 from DatabaseManagement.utils.database_handler import get_conn, select_with_where
 from DatabaseManagement.jobs.generate_report import process_record
+import os
+
+def test_schema_open():
+    schema_path = f"{os.path.dirname(__file__)}/../config/harness_schema.yaml"
+    assert os.path.exists(schema_path)
 
 def test_process_record_interconnect():
     """
