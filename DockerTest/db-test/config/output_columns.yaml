@@ -1,0 +1,16 @@
+start_columns:
+  - harness_net_name
+
+core_columns:
+  - to_connector_$
+  - to_connector_pin_$
+  - from_connector_$
+  - from_connector_pin_$
+  - harness_$
+  - wire_type_$
+
+end_columns:
+  - signal_net_name
+  - cdh_pin
+  - error_flag
+  - errors

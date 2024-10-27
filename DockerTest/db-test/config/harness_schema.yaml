@@ -1,0 +1,41 @@
+harness:
+  columns:
+    harnessname:
+      type: text
+      fillna: ""
+    cablename:
+      type: text
+      fillna: ""
+    cabletype:
+      type: text
+      fillna: ""
+    wirename: 
+      type: text
+      fillna: ""
+    fromconnectorname: 
+      type: text
+      fillna: ""
+    fromconnectorlibdataname:
+      type: text
+      fillna: ""
+    frompinname:
+      type: text
+      fillna: ""
+    fromcontactmodelname:
+      type: text
+      fillna: ""
+    toconnectorname:
+      type: text
+      fillna: ""
+    toconnectorlibdataname:
+      type: text
+      fillna: ""
+    topinname:
+      type: text
+      fillna: ""
+    tocontactmodelname:
+      type: text
+      fillna: ""
+    signal:
+      type: text
+      fillna: ""

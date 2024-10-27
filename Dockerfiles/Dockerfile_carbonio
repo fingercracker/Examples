@@ -1,0 +1,66 @@
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG DB_ADM_PWD="postgres"
+
+RUN apt-get update && \
+    apt-get install -y wget gnupg lsb-release software-properties-common ca-certificates
+
+# RUN wget https://repo.zextras.io/inst_repo_ubuntu.sh && \
+#     chmod u+x inst_repo_ubuntu.sh && \
+#     ./inst_repo_ubuntu.sh
+
+SHELL ["/bin/bash", "-c"]
+
+RUN bash -c "echo 'deb  https://apt.postgresql.org/pub/repos/apt  $(lsb_release -cs)-pgdg main' > /etc/apt/sources.list.d/pgdg.list" && \
+    wget --quiet -O -  https://www.postgresql.org/media/keys/ACCC4CF8.asc  | apt-key add - && \
+    apt clean all && \
+    apt update
+
+RUN add-apt-repository 'deb https://packages.zextras.com/ubuntu jammy main' && \
+    wget -q -O - https://packages.zextras.com/gpg | apt-key add - && \
+    apt update
+
+RUN apt install -y postgresql-16 carbonio-ce
+
+RUN service postgresql start && \
+    su - postgres -c "psql --command=\"CREATE ROLE carbonio_adm WITH LOGIN SUPERUSER encrypted password '$DB_ADM_PWD';\"" && \
+    su - postgres -c "psql --command=\"CREATE DATABASE carbonio_adm owner carbonio_adm;\""
+
+RUN apt install -y service-discover-server \
+    carbonio-directory-server \
+    carbonio-files-db carbonio-mailbox-db \ 
+    carbonio-docs-connector-db carbonio-tasks-db \
+    carbonio-proxy carbonio-webui carbonio-files-ui \
+    carbonio-tasks-ui carbonio-files-public-folder-ui \
+    carbonio-user-management carbonio-mta \
+    carbonio-appserver carbonio-storages-ce \
+    carbonio-files-ce carbonio-preview-ce \
+    carbonio-docs-connector-ce carbonio-tasks-ce \
+    carbonio-docs-editor carbonio-prometheus
+
+# RUN carbonio-bootstrap && \
+#     service-discover setup-wizard && \
+#     pending-setups -a
+
+# RUN PGPASSWORD=$DB_ADM_PWD carbonio-files-db-bootstrap carbonio_adm 127.0.0.1 && \
+#     PGPASSWORD=$DB_ADM_PWD carbonio-tasks-db-bootstrap carbonio_adm 127.0.0.1
+
+# RUN apt install carbonio-message-dispatcher -y && \
+#     pending-setups -a && \  
+#     PGPASSWORD=$DB_ADM_PWD carbonio-message-dispatcher-migration carbonio_adm 127.78.0.10 20000
+
+# RUN apt install carbonio-ws-collaboration-db -y && \
+#     pending-setups -a && \
+#     PGPASSWORD=$DB_ADM_PWD carbonio-ws-collaboration-db-bootstrap carbonio_adm 127.0.0.1
+
+# RUN apt install carbonio-ws-collaboration-ce -y && \
+#     pending-setups -a
+
+# RUN apt install carbonio-videoserver-ce -y && \
+#     pending-setups -a
+
+# RUN apt install carbonio-ws-collaboration-ui -y && \
+#     zextras -c "carbonio prov mc default carbonioFeatureChatsEnabled TRUE"
+CMD ["tail", "-f", "/dev/null"]
