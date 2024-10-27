@@ -1,0 +1,14 @@
+# column names used in select statements in the code
+# the keys should never change, only the values, 
+# unless keys are added or removed. If keys are added
+# or removed, then the code needs to be updated. The values
+# should be a subset of the columns in harness_schema
+harness: harnessname
+wire_type: cabletype
+harness_net_name: signal
+source: fromconnectorname
+target: toconnectorname
+from_pin: frompinname
+to_pin: topinname
+cable_name: cablename
+wire_name: wirename
