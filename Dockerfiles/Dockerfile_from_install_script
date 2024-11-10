@@ -4,7 +4,16 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash", "-c"]
 
+USER root
+
 RUN apt-get update && apt-get -y install sudo
+
+RUN apt-get update && \
+    apt-get install -y wget gnupg lsb-release software-properties-common ca-certificates
+
+RUN wget https://repo.zextras.io/inst_repo_ubuntu.sh && \
+    chmod u+x inst_repo_ubuntu.sh && \
+    ./inst_repo_ubuntu.sh
 
 #PRE-INSTALL STEPS
 
