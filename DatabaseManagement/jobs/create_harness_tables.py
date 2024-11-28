@@ -1,5 +1,5 @@
-import psycopg2
-import DatabaseManagement.database_handler as dh
+import DatabaseManagement.utils.database_handler as dh
+from DatabaseManagement.utils import file_utils
 import pandas as pd
 import yaml
 from typing import Dict, List, Tuple
@@ -28,20 +28,8 @@ def ingest_harness_table_data(
     data = {}
     for harness_file in harness_files:
         harness_file_path = os.path.join(dir_path, harness_file)
-        file_ext = os.path.splitext(harness_file_path)[-1]
-        if file_ext == ".xlsx":
-            df = pd.read_excel(harness_file_path, engine="openpyxl")
-        elif file_ext == ".xls":
-            df = pd.read_excel(harness_file_path, engine="xlrd")
-        elif file_ext == ".csv":
-            df = pd.read_csv(harness_file_path)
-        elif "#" in file_ext:
-            raise Exception(
-                f"harness file {harness_file} appears to have a lock on it. Please close open input files and try again."
-            )
-        else:
-            raise Exception(f"We do not handle file types {file_ext}")
-        
+        df, file_ext = file_utils.dataframe_from_file(harness_file_path)
+
         # fill NA values based on schema
         values = {x: schema[x]["fillna"] for x in schema.keys()}
         # lower case all column names
@@ -86,7 +74,8 @@ def main(dir_path: str, drop=False):
             * drop: Optional boolean param, default = False. If True, then
                 we will drop all tables that we are trying to create if they exist
     """
-    schema = yaml.safe_load(open("DatabaseManagement/harness_schema.yaml"))
+    schema_path = f"{os.path.dirname(__file__)}/../config/harness_schema.yaml"
+    schema = yaml.safe_load(open(schema_path))
     harness_schema = schema["harness"]["columns"]
     errors, harness_data = ingest_harness_table_data(dir_path, harness_schema)
 

@@ -2,28 +2,11 @@ import argparse
 import os
 import pandas as pd
 
-def compare_output_files(path1: str, path2: str):
-    file_ext1 = os.path.splitext(path1)[1]
-    if file_ext1 == ".xlsx":
-        df1 = pd.read_excel(path1, engine="openpyxl")
-    elif file_ext1 == ".xls":
-        df1 = pd.read_excel(path1, engine="xlrd")
-    elif file_ext1 == ".csv":
-        df1 = pd.read_csv(path1)
-    else:
-        raise Exception(f"We don't handle file type {file_ext1}")
-    
-    file_ext2 = os.path.splitext(path2)[1]
-    if file_ext2 == ".xlsx":
-        df2 = pd.read_excel(path2, engine="openpyxl")
-    elif file_ext2 == ".xls":
-        df2 = pd.read_excel(path2, engine="xlrd")
-    elif file_ext2 == ".csv":
-        df2 = pd.read_csv(path2)
-    else:
-        raise Exception(f"We don't handle file type {file_ext2}")
+from DatabaseManagement.utils import file_utils
 
-    assert all([df1.columns[i] == df2.columns[i] for i in range(len(df1.columns))])
+def compare_output_files(path1: str, path2: str):
+    df1, _ = file_utils.dataframe_from_file(path1)
+    df2, _ = file_utils.dataframe_from_file(path2)
 
     df1.sort_values(by=["Harness", "Signal_Net_Name"], inplace=True, ignore_index=True)
     df2.sort_values(by=["Harness", "Signal_Net_Name"], inplace=True, ignore_index=True)
@@ -35,6 +18,8 @@ def compare_output_files(path1: str, path2: str):
         df2[x] = df2[x].str.upper()
 
     pd.testing.assert_frame_equal(df1, df2)
+
+    print("Validation Complete!")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
