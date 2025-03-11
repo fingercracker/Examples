@@ -82,13 +82,14 @@ for i in range(len(letters)):
 #run an example using the strings in 'esses', and hash each of them. We should
 #expect to see minimal collisions. We even include some case snesitive anagrams
 #to show that it is unlikely that two strings will get the same hash.
-esses = ["whatever", "John Willis", "Hola", "I Am From earth", "nohJ silliW", "Liv Criddle", 
-         "www giardiaband com", "www google com", "this is kind of fun all of the time when I"
-         "get bored and continue to write code in the efforts of hopefully one day "
-         "finding a job", "pbr is a wonderfully delicious treat on a warm evening I", 
-         "ahhh ohhhh yeeeahhhhhh", "hhhhhhh big hhhhhhhhhh", "www kenaima com", 
-         "www willistowerswatson com", "www pornhub com", "www bentknee com", 
-         "www github com"]
+esses = [
+    "whatever", "John Willis", "Hola", "I Am From earth", "nohJ silliW", "Liv Criddle", 
+    "www giardiaband com", "www google com", "this is kind of fun all of the time when I"
+    "get bored and continue to write code in the efforts of hopefully one day "
+    "finding a job", "pbr is a wonderfully delicious treat on a warm evening I", 
+    "ahhh ohhhh yeeeahhhhhh", "hhhhhhh big hhhhhhhhhh", "www kenaima com", 
+    "www willistowerswatson com", "www bentknee com", "www github com"
+]
 tableau = {}
 p = list_primes(10000)[9999]
 #create the random vector that will be used in universal_hash
