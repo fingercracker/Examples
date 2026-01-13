@@ -13,15 +13,24 @@ RUN apt-get update && \
 
 SHELL ["/bin/bash", "-c"]
 
-RUN bash -c "echo 'deb  https://apt.postgresql.org/pub/repos/apt  $(lsb_release -cs)-pgdg main' > /etc/apt/sources.list.d/pgdg.list" && \
-    wget --quiet -O -  https://www.postgresql.org/media/keys/ACCC4CF8.asc  | apt-key add - && \
-    apt clean all && \
-    apt update
+RUN <<ZREPO
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/zextras.gpg] https://repo.zextras.io/release/ubuntu jammy main" > /etc/apt/sources.list.d/zextras.list
 
-RUN add-apt-repository 'deb https://packages.zextras.com/ubuntu jammy main' && \
-    wget -q -O - https://packages.zextras.com/gpg | apt-key add - && \
-    apt update
+wget -O- "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x5dc7680bc4378c471a7fa80f52fd40243e584a21" | gpg --dearmor | tee /usr/share/keyrings/zextras.gpg > /dev/null
+chmod 644 /usr/share/keyrings/zextras.gpg
 
+apt update -yq
+ZREPO
+
+RUN <<PGREPO
+echo 'deb  https://apt.postgresql.org/pub/repos/apt jammy-pgdg main' > /etc/apt/sources.list.d/pgdg.list &&
+wget --quiet -O -  https://www.postgresql.org/media/keys/ACCC4CF8.asc  | apt-key add - &&
+apt clean all &&
+apt update
+PGREPO
+
+RUN echo "resolvconf resolvconf/linkify-resolvconf boolean false" | debconf-set-selections
+RUN apt -y install resolvconf 
 RUN apt install -y postgresql-16 carbonio-ce
 
 RUN service postgresql start && \
