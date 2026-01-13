@@ -6,10 +6,12 @@ from typing import Any, Dict, List
 from dotenv import load_dotenv
 import os
 
-def get_conn(host="ema-harness-db", dbname="harness"):
+def get_conn(host="ema-harness-db", dbname="harness", password=None, user=None):
     load_dotenv()
-    password = os.environ["HARNESS_DB_PASSWORD"]
-    user = os.environ["HARNESS_DB_USER"]
+    if password is None:
+        password = os.environ["HARNESS_DB_PASSWORD"]
+    if user is None:
+        user = os.environ["HARNESS_DB_USER"]
     conn = psycopg2.connect(host=host, user=user, password=password, dbname=dbname)
     return conn
 
@@ -106,6 +108,7 @@ def table_exists(conn, table_name: str):
         select table_name from information_schema.tables where table_schema = 'public';    
     """
     cur.execute(sql)
+    conn.commit()
     table_names = cur.fetchall()
     table_names = [x[0] for x in table_names]
     if table_name in table_names:
