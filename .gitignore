@@ -9,6 +9,6 @@
 *.exe
 Swig/C/*.py
 Swig/CXX/*.py
-*.env*
+.env
 *csv
 *.~lock*
